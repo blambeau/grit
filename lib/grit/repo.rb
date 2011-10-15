@@ -310,8 +310,21 @@ module Grit
       Remote.find_all(self)
     end
 
+    # Returns a remote based on the name; nil if not found.
+    #
+    #   @repo.remote('origin/master')
+    #   => #<Grit::Remote "origin/master">
+    #
+    def remote(name)
+      remotes.find{|r| r.name==name}
+    end
+
     def remote_list
       self.git.list_remotes
+    end
+
+    def remote_update
+      self.git.remote({}, 'update')
     end
 
     def remote_add(name, url)
