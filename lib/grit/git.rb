@@ -335,7 +335,9 @@ module Grit
       argv = []
       argv << Git.git_binary
       argv << "--git-dir=#{git_dir}" if base
-      argv << "--work-tree=#{work_tree}" if base && (git_dir != work_tree)
+      unless chdir
+        argv << "--work-tree=#{work_tree}" if base && (git_dir != work_tree)
+      end
       argv << cmd.to_s.tr('_', '-')
       argv.concat(options_to_argv(options))
       argv.concat(args)
