@@ -323,6 +323,10 @@ module Grit
       self.git.list_remotes
     end
 
+    def remote_update
+      self.git.remote({}, 'update')
+    end
+
     def remote_add(name, url)
       self.git.remote({}, 'add', name, url)
     end

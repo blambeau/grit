@@ -417,7 +417,7 @@ class TestRepo < Test::Unit::TestCase
     assert_equal after, @r.git.select_existing_objects(before)
   end
 
-  # remotes and remote
+  # remote methods
 
   def test_remotes
     arr = @r.remotes
@@ -429,5 +429,10 @@ class TestRepo < Test::Unit::TestCase
     rem = @r.remote('origin/master')
     assert rem.is_a?(Grit::Remote)
     assert_equal "origin/master", rem.name
+  end
+
+  def test_remote_update
+    @r.git.expects(:remote).with({}, "update").returns(nil)
+    @r.remote_update
   end
 end
