@@ -1,4 +1,4 @@
-require 'rubygems'
+﻿require 'rubygems'
 require 'rake'
 require 'date'
 
@@ -60,12 +60,17 @@ task :coverage do
   sh "open coverage/index.html"
 end
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "#{name} #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+begin
+  require 'rake/rdoctask'
+  Rake::RDocTask.new do |rdoc|
+    rdoc.rdoc_dir = 'rdoc'
+    rdoc.title = "#{name} #{version}"
+    rdoc.rdoc_files.include('README*')
+    rdoc.rdoc_files.include('lib/**/*.rb')
+  end
+rescue NameError
+  require 'rdoc/task'
+  retry
 end
 
 desc "Open an irb session preloaded with this library"
