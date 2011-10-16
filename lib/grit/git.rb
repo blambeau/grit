@@ -179,7 +179,7 @@ module Grit
 
     def create_tempfile(seed, unlink = false)
       path = Tempfile.new(seed).path
-      File.unlink(path) if unlink
+      File.unlink(path) if unlink rescue nil
       return path
     end
 
