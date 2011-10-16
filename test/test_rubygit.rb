@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/helper'
 require 'tempfile'
+require 'tmpdir'
 
 class TestRubyGit < Test::Unit::TestCase
 
@@ -11,10 +12,7 @@ class TestRubyGit < Test::Unit::TestCase
   end
 
   def test_init_gitdir
-    tf = Tempfile.new('gitdir')
-    temppath = tf.path
-    tf.unlink
-
+    temppath = Dir.mktmpdir('gitdir')
     git = Git.new(temppath)
     git.init({})
     assert File.exists?(File.join(temppath, 'config'))
