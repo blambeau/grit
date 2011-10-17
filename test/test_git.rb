@@ -72,6 +72,10 @@ class TestGit < Test::Unit::TestCase
     end
   end
 
+  def q
+    (RUBY_PLATFORM.downcase =~ /mswin(?!ce)|mingw|bccwin/) ? '"' : "'"
+  end
+  
   def test_it_really_shell_escapes_arguments_to_the_git_shell
     @git.expects(:sh).with("#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} foo --bar='bazz\\'er'")
     @git.run('', :foo, '', {:bar => "bazz'er"}, [])
@@ -89,10 +93,6 @@ class TestGit < Test::Unit::TestCase
     @git.run('', :foo, '', {}, ["bar", "; echo 'noooo'"])
   end
 
-  def q
-    (RUBY_PLATFORM.downcase =~ /mswin(?!ce)|mingw|bccwin/) ? '"' : "'"
-  end
-  
   def test_piping_should_work_on_1_9
     expected = "#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} archive #{q}master#{q} | gzip"
     @git.expects(:sh).with(expected)
@@ -132,14 +132,14 @@ class TestGit < Test::Unit::TestCase
   def test_native_process_info_option_on_failure
     exitstatus, out, err = @git.no_such_command({:process_info => true})
     assert_equal 1, exitstatus
-    assert !err.empty?
+    assert !err.split("\n").reject{|s| /warning:/ =~ s}.empty?
   end
 
   def test_native_process_info_option_on_success
     exitstatus, out, err = @git.help({:process_info => true})
     assert_equal 0, exitstatus
     assert !out.empty?
-    assert err.empty?
+    assert err.split("\n").reject{|s| /warning:/ =~ s}.empty?
   end
 
   def test_raising_exceptions_when_native_git_commands_fail
