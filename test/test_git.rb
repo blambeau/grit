@@ -73,22 +73,29 @@ class TestGit < Test::Unit::TestCase
   end
 
   def test_it_really_shell_escapes_arguments_to_the_git_shell
-    @git.expects(:sh).with("#{Git.git_binary} --git-dir='#{@git.git_dir}' foo --bar='bazz\\'er'")
+    @git.expects(:sh).with("#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} foo --bar='bazz\\'er'")
     @git.run('', :foo, '', {:bar => "bazz'er"}, [])
-    @git.expects(:sh).with("#{Git.git_binary} --git-dir='#{@git.git_dir}' bar -x 'quu\\'x'")
+    
+    @git.expects(:sh).with("#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} bar -x 'quu\\'x'")
     @git.run('', :bar, '', {:x => "quu'x"}, [])
   end
 
   def test_it_shell_escapes_the_standalone_argument
-    @git.expects(:sh).with("#{Git.git_binary} --git-dir='#{@git.git_dir}' foo 'bar\\'s'")
+    @git.expects(:sh).with("#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} foo #{q}bar\\'s#{q}")
     @git.run('', :foo, '', {}, ["bar's"])
 
-    @git.expects(:sh).with("#{Git.git_binary} --git-dir='#{@git.git_dir}' foo 'bar' '\\; echo \\'noooo\\''")
+    expected = "#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} foo #{q}bar#{q} #{q}\\; echo \\'noooo\\'#{q}"
+    @git.expects(:sh).with(expected)
     @git.run('', :foo, '', {}, ["bar", "; echo 'noooo'"])
   end
 
+  def q
+    (RUBY_PLATFORM.downcase =~ /mswin(?!ce)|mingw|bccwin/) ? '"' : "'"
+  end
+  
   def test_piping_should_work_on_1_9
-    @git.expects(:sh).with("#{Git.git_binary} --git-dir='#{@git.git_dir}' archive 'master' | gzip")
+    expected = "#{Git.git_binary} --git-dir=#{q}#{@git.git_dir}#{q} archive #{q}master#{q} | gzip"
+    @git.expects(:sh).with(expected)
     @git.archive({}, "master", "| gzip")
   end
 
