@@ -140,4 +140,10 @@ class TestGit < Test::Unit::TestCase
       @git.native(:bad, {:raise => true})
     end
   end
+
+  def test_native_raises_when_requested_and_something_goes_wrong
+    assert_raises(Grit::Git::CommandFailed) do
+      @git.native(:rev_list, {:raise => true, :blah => true}, "HEAD")
+    end
+  end
 end
